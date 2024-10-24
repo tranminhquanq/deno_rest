@@ -13,7 +13,7 @@ export class AsyncAbortController extends AbortController {
       // deno-lint-ignore no-explicit-any
       listener: any,
       // deno-lint-ignore no-explicit-any
-      options: any
+      options: any,
     ) => {
       if (type !== "abort") {
         return originalEventListener.call(this.signal, type, listener, options);

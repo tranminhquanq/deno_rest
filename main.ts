@@ -1,10 +1,10 @@
 import { Application } from "@oak/oak";
 import configs from "./config/app.ts";
-import { cors } from "./middlewares/http.ts";
-import { onError } from "./middlewares/error.ts";
+import { cors, onError } from "./middlewares/index.ts";
+import type { ApplicationState } from "./types/index.ts";
 import routers from "./routers/index.ts";
 
-const app = new Application();
+const app = new Application<ApplicationState>();
 const abortController = new AbortController();
 const { signal } = abortController;
 
