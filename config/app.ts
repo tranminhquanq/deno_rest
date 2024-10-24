@@ -1,6 +1,31 @@
 import { loadSync } from "@std/dotenv";
 
-const env = Deno.env.get("ENV") || "local";
+function getOptionalConfigFromEnv(
+  key: string,
+  fallback?: string
+): string | undefined {
+  const envValue = Deno.env.get(key);
+
+  if (!envValue && fallback) {
+    return getOptionalConfigFromEnv(fallback);
+  }
+
+  return envValue;
+}
+
+function getConfigFromEnv(key: string, fallbackEnv?: string): string {
+  const value = getOptionalConfigFromEnv(key);
+  if (!value) {
+    if (fallbackEnv) {
+      return getConfigFromEnv(fallbackEnv);
+    }
+    console.error("[Server]", new Error(`${key} is undefined`));
+    Deno.exit(1);
+  }
+  return value;
+}
+
+const env = getOptionalConfigFromEnv("ENV") || "local";
 const envPath = `.env.${env}`;
 
 loadSync({
@@ -11,11 +36,11 @@ loadSync({
 export default {
   env,
   server: {
-    protocol: Deno.env.get("PROTOCOL") || "http",
-    port: parseInt(Deno.env.get("PORT") || "8000"),
-    host: Deno.env.get("HOST") || "localhost",
+    protocol: getOptionalConfigFromEnv("PROTOCOL") || "http",
+    port: parseInt(getOptionalConfigFromEnv("PORT") || "8000"),
+    host: getOptionalConfigFromEnv("HOST") || "localhost",
   },
   postgres: {
-    connectionString: Deno.env.get("DATABASE_URL")!,
+    connectionString: getConfigFromEnv("POSTGRES_CONNECTION_STRING"),
   },
 } as const;
