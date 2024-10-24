@@ -11,7 +11,7 @@ const { signal } = abortController;
 
 const PubSub = new PostgresPubSub(postgres.connectionString);
 PubSub.on("error", (e) => {
-  console.error("[PubSub] Error", e);
+  console.error("[PubSub] Error", e.message);
   abortController.abort();
 });
 
@@ -20,9 +20,8 @@ app.use(cors, transformResponse, onError);
 routers.init(app);
 
 app.addEventListener("listen", () => {
-  console.info(`Environment: ${configs.env}`);
   console.info(
-    `Server listening at: ${server.protocol}://${server.host}:${server.port}`,
+    `[Server] Running at ${server.protocol}://${server.host}:${server.port}`,
   );
 });
 app.addEventListener("error", (event) => {

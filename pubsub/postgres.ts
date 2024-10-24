@@ -31,6 +31,7 @@ export class PostgresPubSub extends EventEmitter implements PubSubAdapter {
 
     await this.subscriber.connect();
     this.isConnected = true;
+    console.info("[PubSub] Connected");
 
     if (opts.signal) {
       opts.signal.addEventListener(
@@ -47,12 +48,12 @@ export class PostgresPubSub extends EventEmitter implements PubSubAdapter {
     await Promise.all(
       this.subscriber.notifications
         .eventNames()
-        .map((channel) => this.subscriber.listenTo(channel.toString())),
+        .map((channel: string) => this.subscriber.listenTo(channel)),
     );
   }
 
   async close(): Promise<void> {
-    this.subscriber.notifications.eventNames().forEach((event) => {
+    this.subscriber.notifications.eventNames().forEach((event: string) => {
       this.subscriber.notifications.removeAllListeners(event);
     });
     console.info("[PubSub] Exiting");
