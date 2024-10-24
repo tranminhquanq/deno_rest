@@ -1,5 +1,5 @@
 import EventEmitter from "node:events";
-import createPostgresSubscriber, { Subscriber } from "npm:pg-listen@1.7.0";
+import createPostgresSubscriber, { Subscriber } from "pg-listen";
 import { APP_ERROR } from "../shared/errors/codes.ts";
 import type { MessageCallback, PubSubAdapter } from "./adapter.ts";
 
@@ -29,33 +29,41 @@ export class PostgresPubSub extends EventEmitter implements PubSubAdapter {
       throw APP_ERROR.Aborted("Postgres pubsub connection aborted");
     }
 
-    await this.subscriber.connect();
-    this.isConnected = true;
-    console.info("[PubSub] Connected");
+    try {
+      await this.subscriber.connect();
+      this.isConnected = true;
+      console.info("[PubSub] Connected");
 
-    if (opts.signal) {
-      opts.signal.addEventListener(
-        "abort",
-        async () => {
-          console.info("[PubSub] Stopping");
-          await this.close();
-          console.info("[PubSub] Stopped");
-        },
-        { once: true },
+      if (opts.signal) {
+        opts.signal.addEventListener(
+          "abort",
+          async () => {
+            console.info("[PubSub] Stopping");
+            await this.close();
+            console.info("[PubSub] Stopped");
+          },
+          { once: true },
+        );
+      }
+
+      await Promise.all(
+        this.subscriber.notifications
+          .eventNames()
+          .map((channel: string | number) =>
+            this.subscriber.listenTo(channel.toString())
+          ),
       );
+    } catch (e) {
+      console.error("[PubSub]", e);
     }
-
-    await Promise.all(
-      this.subscriber.notifications
-        .eventNames()
-        .map((channel: string) => this.subscriber.listenTo(channel)),
-    );
   }
 
   async close(): Promise<void> {
-    this.subscriber.notifications.eventNames().forEach((event: string) => {
-      this.subscriber.notifications.removeAllListeners(event);
-    });
+    this.subscriber.notifications
+      .eventNames()
+      .forEach((event: string | number) => {
+        this.subscriber.notifications.removeAllListeners(event);
+      });
     console.info("[PubSub] Exiting");
     await this.subscriber.close();
     console.info("[PubSub] Exited");

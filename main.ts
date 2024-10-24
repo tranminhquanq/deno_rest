@@ -3,16 +3,14 @@ import configs from "./config/app.ts";
 import { cors, onError, transformResponse } from "./middlewares/index.ts";
 import type { ApplicationState } from "./types/index.ts";
 import routers from "./routers/index.ts";
-import { PostgresPubSub } from "./pubsub/index.ts";
+import { PubSub } from "./database/pubsub.ts";
 
-const { server, postgres } = configs;
+const { server } = configs;
 const abortController = new AbortController();
 const { signal } = abortController;
 
-const PubSub = new PostgresPubSub(postgres.connectionString);
 PubSub.on("error", (e) => {
-  console.error("[PubSub] Error", e.message);
-  abortController.abort();
+  console.error("[PubSub]", e);
 });
 
 const app = new Application<ApplicationState>();
