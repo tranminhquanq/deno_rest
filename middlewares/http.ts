@@ -1,13 +1,14 @@
 import type { Context, Next } from "@oak/oak";
 
-export const cors = (ctx: Context, next: Next) => {
+export const cors = async (ctx: Context, next: Next) => {
   ctx.response.headers.set("Access-Control-Allow-Origin", "*");
   ctx.response.headers.set(
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, DELETE",
   );
   ctx.response.headers.set("Access-Control-Allow-Headers", "Content-Type");
-  next();
+
+  await next();
 };
 
 export const cacheControl = (

@@ -37,7 +37,8 @@ function getRolePermissions(_role: string): Promise<string[]> {
   try {
     return Promise.resolve(["read", "write"]);
   } catch (e) {
-    return Promise.reject(e);
+    console.error(e);
+    return Promise.resolve([]);
   }
 }
 

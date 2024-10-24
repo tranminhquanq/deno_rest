@@ -1,4 +1,4 @@
-import { STATUS_CODE } from "@oak/common/status";
+import { STATUS_CODE, STATUS_TEXT } from "@oak/common/status";
 import { ApiError } from "./renderable.ts";
 
 export enum ErrorCode {
@@ -25,6 +25,6 @@ export const API_ERROR = {
     new ApiError({
       httpCode: httpCode || STATUS_CODE.Unauthorized,
       code: ErrorCode.InvalidToken,
-      message: message || "Unauthorized",
+      message: message || STATUS_TEXT[STATUS_CODE.Unauthorized],
     }),
 };
