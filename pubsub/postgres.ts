@@ -1,7 +1,7 @@
 import EventEmitter from "node:events";
 import createPostgresSubscriber, { Subscriber } from "npm:pg-listen@1.7.0";
 import { APP_ERROR } from "../shared/errors/codes.ts";
-import type { PubSubAdapter } from "./adapter.ts";
+import type { MessageCallback, PubSubAdapter } from "./adapter.ts";
 
 export class PostgresPubSub extends EventEmitter implements PubSubAdapter {
   isConnected: boolean = false;
@@ -24,15 +24,15 @@ export class PostgresPubSub extends EventEmitter implements PubSubAdapter {
     });
   }
 
-  async start(opts?: { signal?: AbortSignal }): Promise<void> {
-    if (opts?.signal?.aborted) {
+  async start(opts: { signal?: AbortSignal } = {}): Promise<void> {
+    if (opts.signal?.aborted) {
       throw APP_ERROR.Aborted("Postgres pubsub connection aborted");
     }
 
     await this.subscriber.connect();
     this.isConnected = true;
 
-    if (opts?.signal) {
+    if (opts.signal) {
       opts.signal.addEventListener(
         "abort",
         async () => {
@@ -64,7 +64,7 @@ export class PostgresPubSub extends EventEmitter implements PubSubAdapter {
     await this.subscriber.notify(channel, payload);
   }
 
-  async subscribe<T>(channel: string, cb: (payload: T) => void): Promise<void> {
+  async subscribe<T>(channel: string, cb: MessageCallback<T>): Promise<void> {
     const listenerCount = this.subscriber.notifications.listenerCount(channel);
     this.subscriber.notifications.on(channel, cb);
 
@@ -73,10 +73,7 @@ export class PostgresPubSub extends EventEmitter implements PubSubAdapter {
     }
   }
 
-  async unsubscribe<T>(
-    channel: string,
-    cb: (message: T) => void,
-  ): Promise<void> {
+  async unsubscribe<T>(channel: string, cb: MessageCallback<T>): Promise<void> {
     this.subscriber.notifications.removeListener(channel, cb);
 
     const isListening =

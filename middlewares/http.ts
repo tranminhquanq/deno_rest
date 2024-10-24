@@ -37,7 +37,7 @@ export const transformResponse = async (ctx: Context, next: Next) => {
 };
 
 export const cacheControl = (
-  options: {
+  opts: {
     maxAge?: number; // Maximum age in seconds
     sMaxAge?: number; // Maximum age for shared caches
     public?: boolean; // Whether the cache is public
@@ -54,25 +54,25 @@ export const cacheControl = (
     await next();
     const directives = [];
 
-    if (options.public) directives.push("public");
-    if (options.private) directives.push("private");
-    if (options.noCache) directives.push("no-cache");
-    if (options.noStore) directives.push("no-store");
-    if (options.mustRevalidate) directives.push("must-revalidate");
-    if (options.proxyRevalidate) directives.push("proxy-revalidate");
+    if (opts.public) directives.push("public");
+    if (opts.private) directives.push("private");
+    if (opts.noCache) directives.push("no-cache");
+    if (opts.noStore) directives.push("no-store");
+    if (opts.mustRevalidate) directives.push("must-revalidate");
+    if (opts.proxyRevalidate) directives.push("proxy-revalidate");
 
-    if (options.staleWhileRevalidate) {
-      directives.push(`stale-while-revalidate=${options.staleWhileRevalidate}`);
+    if (opts.staleWhileRevalidate) {
+      directives.push(`stale-while-revalidate=${opts.staleWhileRevalidate}`);
     }
-    if (options.staleIfError) {
-      directives.push(`stale-if-error=${options.staleIfError}`);
+    if (opts.staleIfError) {
+      directives.push(`stale-if-error=${opts.staleIfError}`);
     }
 
-    if (options.maxAge !== undefined) {
-      directives.push(`max-age=${options.maxAge}`);
+    if (opts.maxAge !== undefined) {
+      directives.push(`max-age=${opts.maxAge}`);
     }
-    if (options.sMaxAge !== undefined) {
-      directives.push(`s-maxage=${options.sMaxAge}`);
+    if (opts.sMaxAge !== undefined) {
+      directives.push(`s-maxage=${opts.sMaxAge}`);
     }
 
     const cacheControlHeader = directives.join(", ");
