@@ -4,9 +4,11 @@ import { ApiError } from "./renderable.ts";
 export enum ErrorCode {
   TokenExpired = "token_expired",
   InvalidToken = "invalid_token",
+  Aborted = "Aborted",
+  AbortedTerminate = "AbortedTerminate",
 }
 
-export const API_ERROR = {
+export const APP_ERROR = {
   TokenExpired: (e?: unknown) =>
     new ApiError({
       httpCode: STATUS_CODE.Unauthorized,
@@ -27,4 +29,18 @@ export const API_ERROR = {
       code: ErrorCode.InvalidToken,
       message: message || STATUS_TEXT[STATUS_CODE.Unauthorized],
     }),
-};
+  Aborted: (message?: string, e?: unknown) =>
+    new ApiError({
+      httpCode: STATUS_CODE.InternalServerError,
+      code: ErrorCode.Aborted,
+      message: message || "Aborted",
+      error: e,
+    }),
+  AbortedTerminate: (message?: string, e?: unknown) =>
+    new ApiError({
+      httpCode: STATUS_CODE.InternalServerError,
+      code: ErrorCode.AbortedTerminate,
+      message: message || "AbortedTerminate",
+      error: e,
+    }),
+} as const;

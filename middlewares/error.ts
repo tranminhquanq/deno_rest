@@ -10,15 +10,13 @@ export const onError = async (ctx: Context, next: Next) => {
     if (isRenderableError(e)) {
       const { httpCode, error } = e.render();
       ctx.response.status = httpCode;
-      ctx.response.body = { error };
+      ctx.response.body = error;
     } else {
       ctx.response.status = STATUS_CODE.InternalServerError;
       ctx.response.body = {
-        error: {
-          code: STATUS_CODE.InternalServerError,
-          message: STATUS_TEXT[STATUS_CODE.InternalServerError],
-          details: e,
-        },
+        code: STATUS_CODE.InternalServerError,
+        message: STATUS_TEXT[STATUS_CODE.InternalServerError],
+        details: e,
       };
     }
   }

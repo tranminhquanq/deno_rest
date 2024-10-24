@@ -11,6 +11,31 @@ export const cors = async (ctx: Context, next: Next) => {
   await next();
 };
 
+export const transformResponse = async (ctx: Context, next: Next) => {
+  await next();
+  const { status, body } = ctx.response;
+  if (status >= 200 && status < 300) {
+    switch (typeof body) {
+      case "string":
+      case "number":
+      case "bigint":
+      case "boolean":
+      case "symbol":
+      case "function":
+        ctx.response.body = body;
+        break;
+      case "undefined":
+      case "object":
+        ctx.response.body = {
+          data: body,
+        };
+        break;
+    }
+  } else {
+    ctx.response.body = { error: body };
+  }
+};
+
 export const cacheControl = (
   options: {
     maxAge?: number; // Maximum age in seconds
