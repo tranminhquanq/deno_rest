@@ -13,7 +13,7 @@ export class PostgresPubSub extends EventEmitter implements PubSubAdapter {
     this.subscriber = createPostgresSubscriber.default(
       { connectionString },
       {
-        retryInterval: (attempt: number) => Math.min(attempt * 100, 1000),
+        retryInterval: (attempt) => Math.min(attempt * 100, 1000),
         retryTimeout: 60 * 1000 * 60 * 14, // 24h
       },
     );
@@ -47,12 +47,12 @@ export class PostgresPubSub extends EventEmitter implements PubSubAdapter {
     await Promise.all(
       this.subscriber.notifications
         .eventNames()
-        .map((channel: unknown) => this.subscriber.listenTo(channel as string)),
+        .map((channel) => this.subscriber.listenTo(channel.toString())),
     );
   }
 
   async close(): Promise<void> {
-    this.subscriber.notifications.eventNames().forEach((event: unknown) => {
+    this.subscriber.notifications.eventNames().forEach((event) => {
       this.subscriber.notifications.removeAllListeners(event);
     });
     console.info("[PubSub] Exiting");
@@ -60,7 +60,7 @@ export class PostgresPubSub extends EventEmitter implements PubSubAdapter {
     console.info("[PubSub] Exited");
   }
 
-  async publish(channel: string, payload: unknown): Promise<void> {
+  async publish<T>(channel: string, payload: T): Promise<void> {
     await this.subscriber.notify(channel, payload);
   }
 

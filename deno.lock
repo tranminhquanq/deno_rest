@@ -24,7 +24,8 @@
     "npm:@shopify/semaphore@^3.1.0": "3.1.0",
     "npm:@types/node@*": "22.5.4",
     "npm:path-to-regexp@6.2.1": "6.2.1",
-    "npm:pg-listen@*": "1.7.0_pg@8.13.0"
+    "npm:pg-listen@*": "1.7.0_pg@8.13.0",
+    "npm:pg-listen@1.7.0": "1.7.0_pg@8.13.0"
   },
   "jsr": {
     "@oak/commons@1.0.0": {

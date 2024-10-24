@@ -15,4 +15,7 @@ export default {
     port: parseInt(Deno.env.get("PORT") || "8000"),
     host: Deno.env.get("HOST") || "localhost",
   },
+  postgres: {
+    connectionString: Deno.env.get("DATABASE_URL")!,
+  },
 } as const;

@@ -4,8 +4,8 @@ import { ApiError } from "./renderable.ts";
 export enum ErrorCode {
   TokenExpired = "token_expired",
   InvalidToken = "invalid_token",
-  Aborted = "Aborted",
-  AbortedTerminate = "AbortedTerminate",
+  Aborted = "aborted",
+  AbortedTerminate = "aborted_terminate",
 }
 
 export const APP_ERROR = {
@@ -40,7 +40,7 @@ export const APP_ERROR = {
     new ApiError({
       httpCode: STATUS_CODE.InternalServerError,
       code: ErrorCode.AbortedTerminate,
-      message: message || "AbortedTerminate",
+      message: message || "Aborted Terminate",
       error: e,
     }),
 } as const;
