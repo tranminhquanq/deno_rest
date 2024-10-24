@@ -3,10 +3,13 @@ import { STATUS_TEXT } from "@oak/oak";
 import { STATUS_CODE } from "@oak/common/status";
 import jwt from "../shared/helpers/jwt.ts";
 import type { permissions } from "../config/rbac.ts";
+import { API_ERROR, isRenderableError } from "../shared/errors/index.ts";
 import type { ApplicationState, UserAuthJwtPayload } from "../types/index.ts";
 
 type Action =
-  `${keyof typeof permissions}:${(typeof permissions)[keyof typeof permissions][number]}`;
+  `${keyof typeof permissions}:${(typeof permissions)[keyof typeof permissions][
+    number
+  ]}`;
 
 export const authenticate = async (ctx: Context, next: Next) => {
   const token = ctx.request.headers
@@ -14,42 +17,34 @@ export const authenticate = async (ctx: Context, next: Next) => {
     ?.replace("Bearer ", "")
     ?.trim();
 
-  if (!token) {
-    ctx.response.status = STATUS_CODE.Unauthorized;
-    ctx.response.body = {
-      message: STATUS_TEXT[STATUS_CODE.Unauthorized],
-      code: STATUS_CODE.Unauthorized,
-    };
-    return ctx;
-  }
+  if (!token) throw API_ERROR.InvalidToken();
 
   try {
     const payload = await jwt.verifyToken<UserAuthJwtPayload>(token);
     if (payload.exp && jwt.isExpired(payload.exp)) {
-      ctx.response.status = STATUS_CODE.Unauthorized;
-      ctx.response.body = { message: "Token expired", code: "token_expired" };
-      return ctx;
+      throw API_ERROR.TokenExpired();
     }
+
     ctx.state.user = { role: payload.role };
     return next();
-  } catch (error) {
-    console.error(error);
-    ctx.response.status = STATUS_CODE.Unauthorized;
-    ctx.response.body = {
-      message: STATUS_TEXT[STATUS_CODE.Unauthorized],
-      code: STATUS_CODE.Unauthorized,
-    };
-    return ctx;
+  } catch (e) {
+    if (isRenderableError(e)) throw e;
+    throw API_ERROR.Unauthorized(STATUS_CODE.Unauthorized);
   }
 };
 
 function getRolePermissions(_role: string): Promise<string[]> {
-  return Promise.resolve(["read", "write"]);
+  try {
+    return Promise.resolve(["read", "write"]);
+  } catch (e) {
+    return Promise.reject(e);
+  }
 }
 
-async function hasPermission(role: string, action: Action) {
-  const rolePermissions = await getRolePermissions(role);
-  return rolePermissions && rolePermissions.includes(action);
+function hasPermission(role: string, action: Action) {
+  return getRolePermissions(role).then((permissions) =>
+    permissions.includes(action)
+  );
 }
 
 export const authorize = (action: Action) => {
@@ -57,11 +52,11 @@ export const authorize = (action: Action) => {
     const userRole = ctx.state.user.role;
 
     const hasAccess = await hasPermission(userRole, action);
-    if (hasAccess) {
-      return next();
-    }
+    if (hasAccess) return next();
 
-    ctx.response.status = STATUS_CODE.Forbidden;
-    ctx.response.body = STATUS_TEXT[STATUS_CODE.Forbidden];
+    throw API_ERROR.Unauthorized(
+      STATUS_CODE.Forbidden,
+      STATUS_TEXT[STATUS_CODE.Forbidden],
+    );
   };
 };
