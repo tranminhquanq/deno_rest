@@ -2,7 +2,7 @@ import { loadSync } from "@std/dotenv";
 
 function getOptionalConfigFromEnv(
   key: string,
-  fallback?: string
+  fallback?: string,
 ): string | undefined {
   const envValue = Deno.env.get(key);
 
@@ -20,7 +20,7 @@ function getConfigFromEnv(key: string, fallbackEnv?: string): string {
       return getConfigFromEnv(fallbackEnv);
     }
     console.error("[Server]", new Error(`${key} is undefined`));
-    Deno.exit(1);
+    Deno.exit();
   }
   return value;
 }
@@ -36,9 +36,9 @@ loadSync({
 export default {
   env,
   server: {
-    protocol: getOptionalConfigFromEnv("PROTOCOL") || "http",
-    port: parseInt(getOptionalConfigFromEnv("PORT") || "8000"),
-    host: getOptionalConfigFromEnv("HOST") || "localhost",
+    protocol: getOptionalConfigFromEnv("SERVER_PROTOCOL") || "http",
+    port: parseInt(getConfigFromEnv("SERVER_PORT"), 10),
+    host: getConfigFromEnv("SERVER_HOST"),
   },
   postgres: {
     connectionString: getConfigFromEnv("POSTGRES_CONNECTION_STRING"),
