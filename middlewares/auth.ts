@@ -34,7 +34,26 @@ export const authenticate = async (ctx: Context, next: Next) => {
 };
 
 function getRolePermissions(_role: string): Promise<string[]> {
-  return Promise.resolve(["read", "write"]); // mock implementation
+  // const { rows } = await pg.queryObject`
+  //   WITH RECURSIVE role_hierarchy AS (
+  //       SELECT id, name, parent_role
+  //       FROM auth.roles
+  //       WHERE name = ${role}
+  //       UNION
+  //       SELECT r.id, r.name, r.parent_role
+  //       FROM auth.roles r
+  //       INNER JOIN role_hierarchy rh ON r.id = rh.parent_role
+  //     )
+  //   SELECT p.entity, p.action
+  //   FROM auth.role_permissions rp
+  //   JOIN auth.permissions p ON rp.permission_id = p.id
+  //   JOIN role_hierarchy rh ON rp.role_id = rh.id;`;
+
+  // return (rows as { entity: string; action: string }[]).map(
+  //   (r) => `${r.entity}:${r.action}`,
+  // );
+
+  return Promise.resolve([]);
 }
 
 function hasPermission(role: string, action: Action) {

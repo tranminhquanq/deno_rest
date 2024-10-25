@@ -1,5 +1,5 @@
 import { Application } from "@oak/oak";
-import configs from "./config/app.ts";
+import configs from "./config/app.config.ts";
 import { cors, onError, transformResponse } from "./middlewares/index.ts";
 import type { ApplicationState } from "./types/index.ts";
 import routers from "./routers/index.ts";
@@ -29,7 +29,6 @@ app.addEventListener("error", (event) => {
   console.error(event.error);
   serverAbortController.abort();
 });
-
 
 async function gracefulShutdown() {
   if (isShuttingDown) return; // Prevent multiple shutdown calls

@@ -76,6 +76,8 @@ export const cacheControl = (
     }
 
     const cacheControlHeader = directives.join(", ");
-    ctx.response.headers.set("Cache-Control", cacheControlHeader);
+    if (cacheControlHeader) {
+      ctx.response.headers.set("Cache-Control", cacheControlHeader);
+    }
   };
 };

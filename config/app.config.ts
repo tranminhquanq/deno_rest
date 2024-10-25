@@ -41,6 +41,11 @@ export default {
     host: getConfigFromEnv("SERVER_HOST"),
   },
   postgres: {
+    db: getConfigFromEnv("POSTGRES_DB"),
+    user: getConfigFromEnv("POSTGRES_USER"),
+    password: getConfigFromEnv("POSTGRES_PASSWORD"),
+    port: parseInt(getOptionalConfigFromEnv("POSTGRES_PORT") || "5432", 10),
+    host: getOptionalConfigFromEnv("POSTGRES_HOST") || "localhost",
     connectionString: getConfigFromEnv("POSTGRES_CONNECTION_STRING"),
   },
 } as const;

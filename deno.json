@@ -3,14 +3,17 @@
     "dev": "deno serve --allow-net --allow-env --watch -R main.ts"
   },
   "imports": {
+    "@oak/common/status": "jsr:@oak/commons@1/status",
     "@oak/oak": "jsr:@oak/oak@^17.1.1",
+    "@shopify/semaphore": "npm:@shopify/semaphore@^3.1.0",
     "@std/assert": "jsr:@std/assert@1",
     "@std/dotenv": "jsr:@std/dotenv@^0.225.2",
     "@std/http": "jsr:@std/http@1",
-    "@oak/common/status": "jsr:@oak/commons@1/status",
-    "@shopify/semaphore": "npm:@shopify/semaphore@^3.1.0",
     "bcrypt": "https://deno.land/x/bcrypt@v0.4.0/mod.ts",
     "djwt": "https://deno.land/x/djwt@v3.0.2/mod.ts",
+    "drizzle-kit": "npm:drizzle-kit@^0.26.2",
+    "drizzle-orm": "npm:drizzle-orm@^0.35.3",
+    "drizzle-orm/pg-core": "npm:drizzle-orm@^0.35.3/pg-core",
     "pg-listen": "npm:pg-listen@1.7.0"
   }
 }
